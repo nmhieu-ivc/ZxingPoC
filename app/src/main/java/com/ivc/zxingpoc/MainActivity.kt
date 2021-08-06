@@ -1,6 +1,7 @@
 package com.ivc.zxingpoc
 
 import android.bluetooth.BluetoothAdapter
+import android.content.Context
 import android.net.wifi.WifiManager
 import android.nfc.NfcAdapter
 import android.os.BatteryManager
@@ -12,6 +13,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import com.google.zxing.integration.android.IntentIntegrator
+
 
 class MainActivity : BaseActivity() {
 
@@ -49,6 +51,7 @@ class MainActivity : BaseActivity() {
         Log.d("MainActivity", "NFC is ${isNFCEnable()}")
         Log.d("MainActivity", "Bluetooth is ${isBluetoothEnable()}")
         Log.d("MainActivity", "Battery is ${currentBatteryLevel()}%")
+        Log.d("MainActivity", "Wifi Signal Level is ${currentWifiLevel()}")
     }
 
     private val zxingActivityResultLauncher  = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
@@ -80,6 +83,12 @@ class MainActivity : BaseActivity() {
     private fun currentBatteryLevel(): Int {
         val bm = applicationContext.getSystemService(BATTERY_SERVICE) as BatteryManager
         return bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
+    }
+
+    private fun currentWifiLevel() : Int {
+        val wifiInfo = (getSystemService(Context.WIFI_SERVICE) as WifiManager).connectionInfo
+        // A level of the signal, given in the range of 0 to numLevels-1
+        return WifiManager.calculateSignalLevel(wifiInfo.rssi, 5)
     }
 
 }
