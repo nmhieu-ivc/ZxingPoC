@@ -1,19 +1,16 @@
 package com.ivc.zxingpoc
 
-import android.os.Build
+import android.bluetooth.BluetoothAdapter
+import android.net.wifi.WifiManager
+import android.nfc.NfcAdapter
+import android.os.BatteryManager
 import android.os.Bundle
-import android.view.View
-import android.view.WindowInsets
-import android.view.WindowInsetsController
+import android.util.Log
 import android.webkit.WebView
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.WindowInsetsControllerCompat
 import com.google.zxing.integration.android.IntentIntegrator
 
 class MainActivity : BaseActivity() {
@@ -46,6 +43,12 @@ class MainActivity : BaseActivity() {
         (findViewById<Button>(R.id.btSend)).setOnClickListener {
             Toast.makeText(this, "Button SEND is clicked", Toast.LENGTH_SHORT).show()
         }
+
+
+        Log.d("MainActivity", "Wifi is ${isWiFiEnable()}")
+        Log.d("MainActivity", "NFC is ${isNFCEnable()}")
+        Log.d("MainActivity", "Bluetooth is ${isBluetoothEnable()}")
+        Log.d("MainActivity", "Battery is ${currentBatteryLevel()}%")
     }
 
     private val zxingActivityResultLauncher  = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
@@ -53,6 +56,30 @@ class MainActivity : BaseActivity() {
         if(intentResult.contents != null) {
             tvResultQR.text = intentResult.contents
         }
+    }
+
+    private fun isWiFiEnable(): Boolean {
+        return (getSystemService(WIFI_SERVICE) as WifiManager).isWifiEnabled
+    }
+
+    private fun isNFCEnable(): Boolean {
+        val nfcAdapter = NfcAdapter.getDefaultAdapter(this)
+        nfcAdapter?.run {
+            return this.isEnabled
+        }
+        return false
+    }
+
+    private fun isBluetoothEnable(): Boolean {
+        BluetoothAdapter.getDefaultAdapter()?.run {
+            return this.isEnabled
+        }
+        return false
+    }
+
+    private fun currentBatteryLevel(): Int {
+        val bm = applicationContext.getSystemService(BATTERY_SERVICE) as BatteryManager
+        return bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
     }
 
 }
